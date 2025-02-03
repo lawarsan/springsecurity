@@ -17,7 +17,19 @@ public class JwtService {
     private static final String SECRET_KEY = "YourVerySecretKeyThatShouldBeAtLeast32BytesLong";
     private final Map<String, UserDetails> users = new HashMap<>();
 
+  public String generateToken(String username) {
+        return generateToken(new HashMap<>(), username);
+    }
 
+    public String generateToken(Map<String, Object> extraClaims, String username) {
+        return Jwts.builder()
+            .setClaims(extraClaims)
+            .setSubject(username)
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour validity
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
+    }
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
